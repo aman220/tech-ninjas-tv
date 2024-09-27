@@ -1,101 +1,109 @@
-import Image from "next/image";
+"use client";
+import { Search, Menu, ChevronDown } from "lucide-react";
+import { useState, useEffect } from "react";
+
+// Function to parse the M3U data
+const parseChannelsData = async () => {
+  const response = await fetch("https://tech-ninjas-tv.vercel.app/channels.txt");
+  const data = await response.text();
+
+  const lines = data.split("\n").filter(line => line.trim() !== "");
+  const channels = [];
+  let currentChannel = {};
+  lines.forEach(line => {
+    if (line.startsWith('#EXTINF')) {
+      const parts = line.split(',');
+      const infoParts = parts[0].split(' ');
+      currentChannel.name = parts[1];
+      infoParts.forEach(part => {
+        if (part.startsWith('tvg-logo=')) {
+          currentChannel.logo = part.split('=')[1].replace(/"/g, '');
+        }
+      });
+    } else if (line.startsWith('http')) {
+      currentChannel.url = line;
+      channels.push(currentChannel);
+      currentChannel = {};
+    }
+  });
+  console.log(channels);
+
+  return channels;
+};
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [channels, setChannels] = useState([]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    parseChannelsData().then((parsedChannels) => {
+      setChannels(parsedChannels);
+    });
+  }, []);
+
+  const openPlayer = (url) => {
+    const playerWindow = window.open(`/Player?url=${encodeURIComponent(url)}`, '_blank');
+    if (playerWindow) {
+      playerWindow.focus();
+    } else {
+      alert('Please allow popups for this website');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <header className="bg-purple-900 text-white">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Menu className="h-6 w-6 md:hidden" />
+            <h1 className="text-2xl font-bold">Tech Ninjas</h1>
+          </div>
+          <nav className="hidden md:flex space-x-6">
+            <a href="#" className="hover:text-purple-300">Home</a>
+            <a href="#" className="border-b-2 border-purple-500">Live TV</a>
+            <a href="#" className="hover:text-purple-300">On Demand</a>
+            <a href="#" className="hover:text-purple-300">Watchlist</a>
+            <a href="#" className="hover:text-purple-300">My Box</a>
+          </nav>
+          <div className="flex items-center space-x-4">
+            <Search className="h-5 w-5" />
+            <div className="flex items-center">
+              <span>A</span>
+              <ChevronDown className="h-4 w-4" />
+            </div>
+            <img src="/placeholder.svg?height=32&width=32" alt="User" className="w-8 h-8 rounded-full" />
+          </div>
+        </div>
+      </header>
+      <main className="container mx-auto px-4 py-8">
+        <h2 className="text-3xl font-bold text-purple-900 mb-6">Your Loved Channels</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {channels.length > 0 ? (
+            channels.map((channel, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 ease-in-out transform hover:scale-105"
+                onClick={() => openPlayer(channel.url)} // Open player in a new window
+              >
+                <div className="p-4 flex items-center justify-center h-40 bg-gray-50">
+                  <img
+                    src={channel.logo}
+                    alt={channel.name}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                </div>
+                <div className="p-4 border-t border-gray-200">
+                  <h3 className="text-lg font-semibold text-center text-gray-800 mb-1 truncate">
+                    {channel.name}
+                  </h3>
+                  <p className="text-sm text-gray-500 text-center">{channel.category}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>Loading channels...</p>
+          )}
         </div>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
