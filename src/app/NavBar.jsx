@@ -12,10 +12,10 @@ const NavBar = () => {
           </div>
           <nav className="hidden md:flex space-x-6">
             <a href="#" className="hover:text-purple-300">Home</a>
-            <Link href={'/'} className="border-b-2 border-purple-500">Live TV</Link>
+            <Link href={'/'} className=" border-purple-500">Live TV</Link>
             <Link href={"movies"} className="hover:text-purple-300">Movies</Link>
-            <a href="#" className="hover:text-purple-300">Watchlist</a>
-            <a href="#" className="hover:text-purple-300">My Box</a>
+            <a href="#" className="hover:text-purple-300">Web Series</a>
+            <a href="#" className="hover:text-purple-300">Hollywood</a>
           </nav>
           <div className="flex items-center space-x-4">
             <Search className="h-5 w-5" />

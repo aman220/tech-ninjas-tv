@@ -57,7 +57,9 @@ function MovieSection({ title, movies }) {
               height={300}
               className="rounded-lg shadow-md mb-2"
             />
-            <h3 className="font-semibold text-sm mb-1 truncate">{movie.title}</h3>
+            <h3 className="font-semibold text-sm mb-1 truncate">
+              {movie.title}
+            </h3>
           </div>
         ))}
       </div>
@@ -70,6 +72,7 @@ const Page = () => {
   const [moviesOnRent, setMoviesOnRent] = useState([]);
   const [filteredMovies, setFilteredMovies] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setIsClient(true);
@@ -77,8 +80,9 @@ const Page = () => {
       .then((res) => res.text())
       .then((data) => {
         const parsedMovies = parseMovies(data);
-        setMoviesOnRent(parsedMovies.slice(0,100));
-        setFilteredMovies(parsedMovies.slice(0,100));
+        setMoviesOnRent(parsedMovies.slice(0, 20000));
+        setFilteredMovies(parsedMovies.slice(0, 20000));
+        setIsLoading(false);  // Set loading to false after fetching
       });
   }, []);
 
@@ -87,9 +91,9 @@ const Page = () => {
       const searchResults = moviesOnRent.filter((movie) =>
         movie.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      setFilteredMovies(searchResults.slice(0 , 100));
+      setFilteredMovies(searchResults.slice(0, 20000));
     } else {
-      setFilteredMovies(moviesOnRent.slice(0,100));
+      setFilteredMovies(moviesOnRent.slice(0, 20000));
     }
   }, [searchQuery, moviesOnRent]);
 
@@ -108,7 +112,19 @@ const Page = () => {
           placeholder="Search for a movie..."
           className="border border-gray-300 rounded px-4 py-2 mb-4 w-full"
         />
-        <MovieSection title="Movies On Rent" movies={filteredMovies} />
+        {isLoading ? (
+          <div className="flex justify-center items-center">
+            <p>Loading movies, please wait...</p>
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-col justify-center items-center">
+              <h2 className="text-bold text-base">Total Count : 20k</h2>
+              <h2 className="text-bold text-base my-4">(Movies may not work if you use GLA internet. Use your own internet or using VPN for better experience)</h2>
+            </div>
+            <MovieSection title="Movies for You" movies={filteredMovies} />
+          </>
+        )}
       </div>
     </>
   );
