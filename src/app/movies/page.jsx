@@ -80,8 +80,8 @@ const Page = () => {
       .then((res) => res.text())
       .then((data) => {
         const parsedMovies = parseMovies(data);
-        setMoviesOnRent(parsedMovies.slice(0, 20000));
-        setFilteredMovies(parsedMovies.slice(0, 20000));
+        setMoviesOnRent(parsedMovies.slice(0, 50000));
+        setFilteredMovies(parsedMovies.slice(0, 50000));
         setIsLoading(false);  // Set loading to false after fetching
       });
   }, []);
@@ -91,9 +91,9 @@ const Page = () => {
       const searchResults = moviesOnRent.filter((movie) =>
         movie.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      setFilteredMovies(searchResults.slice(0, 20000));
+      setFilteredMovies(searchResults.slice(0, 50000));
     } else {
-      setFilteredMovies(moviesOnRent.slice(0, 20000));
+      setFilteredMovies(moviesOnRent.slice(0, 50000));
     }
   }, [searchQuery, moviesOnRent]);
 
