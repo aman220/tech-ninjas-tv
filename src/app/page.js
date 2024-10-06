@@ -1,6 +1,8 @@
 "use client";
-import { Search, Menu, ChevronDown } from "lucide-react";
+
 import { useState, useEffect } from "react";
+import NavBar from "./NavBar"
+
 
 // Function to parse the M3U data
 const parseChannelsData = async () => {
@@ -51,29 +53,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <header className="bg-purple-900 text-white">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Menu className="h-6 w-6 md:hidden" />
-            <h1 className="text-2xl font-bold">Tech Ninjas</h1>
-          </div>
-          <nav className="hidden md:flex space-x-6">
-            <a href="#" className="hover:text-purple-300">Home</a>
-            <a href="#" className="border-b-2 border-purple-500">Live TV</a>
-            <a href="#" className="hover:text-purple-300">On Demand</a>
-            <a href="#" className="hover:text-purple-300">Watchlist</a>
-            <a href="#" className="hover:text-purple-300">My Box</a>
-          </nav>
-          <div className="flex items-center space-x-4">
-            <Search className="h-5 w-5" />
-            <div className="flex items-center">
-              <span>A</span>
-              <ChevronDown className="h-4 w-4" />
-            </div>
-            <img src="/placeholder.svg?height=32&width=32" alt="User" className="w-8 h-8 rounded-full" />
-          </div>
-        </div>
-      </header>
+      <NavBar></NavBar>
       <main className="container mx-auto px-4 py-8">
         <h2 className="text-3xl font-bold text-purple-900 mb-6">Your Loved Channels</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
